@@ -14,6 +14,9 @@ public class Enemy {
 	}
 	
 	// ** MEMBER VARIABLE ACCESS METHODS **//
+	public int getType() {
+		return type;
+	}
 	public int getX() {
 		return x;
 	}
