@@ -228,9 +228,19 @@ public class GameState {
 		Random randRoller = new Random();
 		for(int x = 0; x < 3; x++) {
 			
-			// 
-			randRoller.nextInt(red + nothing + white);
-			//enemySet.add(new Enemy(type , x, y));
+			int roll = randRoller.nextInt(red + nothing + white);
+			// Add a red blood cell to the row and remove one from the pool.
+			if(roll < red) {
+				enemySet.add(new Enemy(0 , x, y));
+				red -= 1; if(red < 0){ red = 0; }
+			// Add nothing to the row and remove one from the pool.
+			} else if(roll < (red + nothing)) {
+				nothing -= 1; if(nothing < 0){ nothing = 0; }
+			// Add a white blood cell to the row and remove one from the pool.
+			} else {
+				enemySet.add(new Enemy(1 , x, y));
+				white -= 1; if(white < 0){ white = 0; }
+			}
 		}
 	}
 }
