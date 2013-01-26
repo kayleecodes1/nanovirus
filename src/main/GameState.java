@@ -1,6 +1,8 @@
 package main;
+import java.util.ArrayList;
 
 public class GameState {
+	
 	private boolean	paused;			// Is the game paused?
 	private int		x;				// The the x- and y-coordinate of the
 	private int		y;				// 		nanovirus within the current tunnel image.
@@ -8,7 +10,10 @@ public class GameState {
 	private int		speed;			// The speed of the nanovirus.
 	private int		yoff;			// The y-offset of the next tunnel image.
 	
-	//** CONSTRUCTOR **//
+	private ArrayList<Enemy>	enemiesCurrent;	// The enemies in the current tunnel.
+	private ArrayList<Enemy>	enemiesNext;	// The enemies in the next tunnel.
+	
+	// The main GameState constructor.
 	public GameState(boolean paused, int x, String transition, int y,
 			int speed, int yoff) {
 		this.paused = paused;
@@ -17,9 +22,11 @@ public class GameState {
 		this.transition = transition;
 		this.speed = speed;
 		this.yoff = yoff;
+		this.enemiesCurrent = new ArrayList<Enemy>();
+		this.enemiesNext = new ArrayList<Enemy>();
 	}
 	
-	// ** MEMBER VARIABLE ACCESS **/
+	// ** MEMBER VARIABLE ACCESS METHODS **/
 	public boolean isPaused() {
 		return paused;
 	}
@@ -38,8 +45,14 @@ public class GameState {
 	public int getYoff() {
 		return yoff;
 	}
+	public ArrayList<Enemy> getCurrentEnemies() {
+		return enemiesCurrent;
+	}
+	public ArrayList<Enemy> getNextEnemies() {
+		return enemiesNext;
+	}
 	
-	//** MEMBER VARIABLE MODIFICATION **/
+	//** MEMBER VARIABLE MODIFICATION METHODS **/
 	public void setPaused(boolean paused) {
 		this.paused = paused;
 	}
@@ -57,6 +70,12 @@ public class GameState {
 	}
 	public void setYoff(int yoff) {
 		this.yoff = yoff;
+	}
+	public void setCurrentEnemies(ArrayList<Enemy> currentEnemies) {
+		this.enemiesCurrent = currentEnemies;
+	}
+	public void setNextEnemies(ArrayList<Enemy> nextEnemies) {
+		this.enemiesNext = nextEnemies;
 	}
 	
 	/**
@@ -77,9 +96,13 @@ public class GameState {
 		}
 		
 		// If the nanovirus has passed out of the current tunnel and
-		// entered a new one, reset the x-coordinate for the new tunnel.
-		if (getX() >= 800)
+		// entered a new one, reset the nanovirus x-coordinate for
+		// the new tunnel and reset the transition and sound trigger.
+		if (getX() >= 800) {
 			setX(getX() - 800);
+			setTransition("");
+			nanoVirusMain.played = false;
+		}
 		// 
 		if (nanoVirusMain.bgx >= 800)
 			nanoVirusMain.bgx = nanoVirusMain.bgx - 800;
@@ -91,27 +114,47 @@ public class GameState {
 			nanoVirusMain.heartbeat.play();
 		}
 		
-		// If the nanovirus has passed a transition point, reset the
-		// transition and ready the heartbeat sound to trigger again.
-		if (150 < getX() && getX() < 600) {
-		} else {
-			setTransition("");
-			nanoVirusMain.played = false;
-		}
-		
 		// If the nanovirus is transitioning up, adjust its y-coordinate
 		// so that it will reach the upper tunnel by x == 600.
 		if (getTransition().equals("up")) {
+			
 			setY(getY() + (0 - getY()) / (600 - getX()) * getSpeed());
+			
 		// If the nanovirus is transitioning down, adjust its y-coordinate
 		// so that it will reach the lower tunnel by x == 600.
 		} else if (getTransition().equals("down")) {
+			
 			setY(getY() - (getY() - 360) / (600 - getX()) * getSpeed());
+			
 		// If the nanovirus is staying in the middle tunnel,
 		// reset its y-coordinate and y-offset.
 		} else {
+			
 			setY(180);
 			setYoff(0);
 		}
+	}
+	
+	/**
+	 * @param nanoVirusMain
+	 * 
+	 * 		updateEnemies: 	Updates the enemies of the game world.
+	 */
+	void updateEnemies(NanoVirusMain nanoVirusMain) {
+		
+		// 
+		
+	}
+	
+	/**
+	 * 		generateEnemySet: 	Generates a new set of enemies based
+	 * 							on the current GameState.
+	 */
+	private ArrayList<Enemy> generateEnemySet() {
+		
+		// Set up a new ArrayList of Enemies
+		ArrayList<Enemy> newEnemySet = new ArrayList<Enemy>();
+		
+		return newEnemySet;
 	}
 }
