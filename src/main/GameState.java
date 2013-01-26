@@ -10,6 +10,7 @@ public class GameState {
 	private int		speed;			// The speed of the nanovirus.
 	private int		yoff;			// The y-offset of the next tunnel image.
 	
+	private boolean 			enemiesSpawned;	// Have enemies been spawned for the current tunnel?
 	private ArrayList<Enemy>	enemiesCurrent;	// The enemies in the current tunnel.
 	private ArrayList<Enemy>	enemiesNext;	// The enemies in the next tunnel.
 	
@@ -45,6 +46,9 @@ public class GameState {
 	public int getYoff() {
 		return yoff;
 	}
+	public boolean getEnemiesSpawned() {
+		return enemiesSpawned;
+	}
 	public ArrayList<Enemy> getCurrentEnemies() {
 		return enemiesCurrent;
 	}
@@ -71,6 +75,9 @@ public class GameState {
 	public void setYoff(int yoff) {
 		this.yoff = yoff;
 	}
+	public void setEnemiesSpawned(boolean enemiesSpawned) {
+		this.enemiesSpawned = enemiesSpawned;
+	}
 	public void setCurrentEnemies(ArrayList<Enemy> currentEnemies) {
 		this.enemiesCurrent = currentEnemies;
 	}
@@ -95,23 +102,37 @@ public class GameState {
 			nanoVirusMain.bgx += nanoVirusMain.bgSpeed;
 		}
 		
-		// If the nanovirus has passed out of the current tunnel and
-		// entered a new one, reset the nanovirus x-coordinate for
-		// the new tunnel and reset the transition and sound trigger.
+		// If the nanovirus has passed into the next tunnel section ...
 		if (getX() >= 800) {
+			
+			// Reset the nanovirus x-coordinate for the new tunnel.
 			setX(getX() - 800);
+			// Reset the transition.
 			setTransition("");
+			// Reset the sound trigger.
 			nanoVirusMain.played = false;
+			// Reset the enemy spawner.
+			setEnemiesSpawned(false);
 		}
-		// 
+		// Reset the background x-coordinate if it's offscreen.
 		if (nanoVirusMain.bgx >= 800)
 			nanoVirusMain.bgx = nanoVirusMain.bgx - 800;
 		
-		// If the nanovirus is in the reaction area and the
-		// heartbeat sound has not played yet, play the sound.
+		// If the nanovirus is in the reaction area ...
 		if (150 < getX() && getX() < 350 && !nanoVirusMain.played) {
-			nanoVirusMain.played = true;
-			nanoVirusMain.heartbeat.play();
+			
+			// If the heartbeat sound has not played yet, play it.
+			if(!nanoVirusMain.played) {
+				nanoVirusMain.played = true;
+				nanoVirusMain.heartbeat.play();
+			}
+			
+			// If the next enemies have not been spawned yet, spawn them.
+			if(!getEnemiesSpawned()) {
+				setCurrentEnemies(enemiesNext);
+				setNextEnemies(generateEnemySet());
+				setEnemiesSpawned(true);
+			}
 		}
 		
 		// If the nanovirus is transitioning up, adjust its y-coordinate
@@ -124,7 +145,7 @@ public class GameState {
 		// so that it will reach the lower tunnel by x == 600.
 		} else if (getTransition().equals("down")) {
 			
-			setY(getY() - (getY() - 360) / (600 - getX()) * getSpeed());
+			setY(getY() - (getY() - 360) / (600 - getX()) * getSpeed());			
 			
 		// If the nanovirus is staying in the middle tunnel,
 		// reset its y-coordinate and y-offset.
@@ -136,17 +157,6 @@ public class GameState {
 	}
 	
 	/**
-	 * @param nanoVirusMain
-	 * 
-	 * 		updateEnemies: 	Updates the enemies of the game world.
-	 */
-	void updateEnemies(NanoVirusMain nanoVirusMain) {
-		
-		// 
-		
-	}
-	
-	/**
 	 * 		generateEnemySet: 	Generates a new set of enemies based
 	 * 							on the current GameState.
 	 */
@@ -155,6 +165,9 @@ public class GameState {
 		// Set up a new ArrayList of Enemies
 		ArrayList<Enemy> newEnemySet = new ArrayList<Enemy>();
 		
+		
+		
+		// Return the generated set of enmies.
 		return newEnemySet;
 	}
 }
