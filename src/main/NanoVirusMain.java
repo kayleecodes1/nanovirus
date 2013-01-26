@@ -173,7 +173,14 @@ public class NanoVirusMain extends JFrame {
 
 		for (Enemy e : state.getCurrentEnemies())
 			bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
-					(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5), 85, 85, null);
+					(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5) + e.getY() * 180, 85, 85, null);
+
+		for (Enemy e : state.getNextEnemies())
+			bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
+					(int) (-state.getYoff() + 250 - state.getY() + (rand.nextFloat() - .5) * 5) + e.getY() * 180, 85,
+					85, null);
+		//		bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
+		//				(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5) + 0 * 180, 85, 85, null);
 
 		//draw the player 
 		bufferGraphics.setColor(Color.BLUE);
