@@ -197,14 +197,25 @@ public class NanoVirusMain extends JPanel {
 		bufferGraphics.drawImage(arteries, -state.getX(), -state.getY(), 800, 960, null);
 		bufferGraphics.drawImage(arteries, -state.getX() + 800, -state.getY() - state.getYoff(), 800, 960, null);
 
-		for (Enemy e : state.getCurrentEnemies())
-			bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
+		BufferedImage img;
+		for (Enemy e : state.getCurrentEnemies()) {
+			if (e.getType() == 0)
+				img = red;
+			else
+				img = white;
+			bufferGraphics.drawImage(img, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5) + e.getX() * 50,
 					(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5) + e.getY() * 180, 85, 85, null);
-
-		for (Enemy e : state.getNextEnemies())
-			bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
+		}
+		for (Enemy e : state.getNextEnemies()) {
+			if (e.getType() == 0)
+				img = red;
+			else
+				img = white;
+			bufferGraphics.drawImage(img, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5) + e.getX() * 50
+					+ 800,
 					(int) (-state.getYoff() + 250 - state.getY() + (rand.nextFloat() - .5) * 5) + e.getY() * 180, 85,
 					85, null);
+		}
 		//		bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
 		//				(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5) + 0 * 180, 85, 85, null);
 
@@ -223,7 +234,6 @@ public class NanoVirusMain extends JPanel {
 		//do the timing calculations
 		doTiming();
 	}
-
 	private void run() {
 
 		//set up an infinite loop of updates/repaints
