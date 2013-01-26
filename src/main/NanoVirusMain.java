@@ -12,9 +12,10 @@ import javax.swing.*;
 
 public class NanoVirusMain extends JFrame {
 
+	Random						rand	= new Random();
+
 	/** current total running time in frames */
 	float						f		= 0;
-
 
 	/** current total running time in milliseconds */
 	int							dur		= 0;
@@ -50,6 +51,10 @@ public class NanoVirusMain extends JFrame {
 	/** flag that indicates whether the hearbeat sound clip has just played */
 	boolean						played;
 
+	private BufferedImage		red;
+
+	private BufferedImage		white;
+
 	private NanoVirusMain() {
 		super();
 
@@ -57,10 +62,14 @@ public class NanoVirusMain extends JFrame {
 			//load the background and blood vessel images
 			bg = ImageIO.read(getClass().getResourceAsStream("bgtest.jpg"));
 			arteries = ImageIO.read(getClass().getResourceAsStream("arteriesTile_TEST.png"));
+			red = ImageIO.read(getClass().getResourceAsStream("redBloodCell.png"));
+			white = ImageIO.read(getClass().getResourceAsStream("whiteBloodCell.png"));
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 		//load the heatbeat sound effect
 		heartbeat = new Sound("bin/main/heartbeatTest.mp3");
 		// Sound soundtrack = new Sound("bin/soundtrack.mp3");
@@ -70,17 +79,19 @@ public class NanoVirusMain extends JFrame {
 		setMinimumSize(new Dimension(800, 600));
 		validate();
 		setVisible(true);
+
 		//try to use hardware acceleration
 		bg.setAccelerationPriority(.5f);
 		arteries.setAccelerationPriority(1);
+
 		// Create an offscreen image to draw on
 		offscreen = bg.createGraphics().getDeviceConfiguration()
 				.createCompatibleVolatileImage(800, 600, Transparency.BITMASK);
 		offscreen.setAccelerationPriority(1);
+
 		// by doing this everything that is drawn by bufferGraphics
 		// will be written on the offscreen image.
 		bufferGraphics = offscreen.createGraphics();
-
 
 		bufferGraphics.setColor(Color.BLUE);
 
@@ -151,7 +162,6 @@ public class NanoVirusMain extends JFrame {
 		// update the game state
 		updateState();
 
-
 		//------------draw everything to the buffer
 		//draw the background
 		bufferGraphics.drawImage(bg, -bgx, 0, 800, 600, null);
@@ -161,10 +171,20 @@ public class NanoVirusMain extends JFrame {
 		bufferGraphics.drawImage(arteries, -state.getX(), -state.getY(), 800, 960, null);
 		bufferGraphics.drawImage(arteries, -state.getX() + 800, -state.getY() - state.getYoff(), 800, 960, null);
 
+		//draw the blood cells
+		int cellY = 360;
+		bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
+				(int) (250 - state.getY() + cellY + (rand.nextFloat() - .5) * 5), 85, 85, null);
+
+		cellY = 0;
+		bufferGraphics.drawImage(white, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
+				(int) (250 - state.getY() + cellY + (rand.nextFloat() - .5) * 5), 85, 85, null);
+
 		//draw the player 
+		bufferGraphics.setColor(Color.BLUE);
 		bufferGraphics.drawOval(50, 275, 50, 50);
 
-		//draw the buffer to the canvas
+		//-----------draw the buffer to the canvas
 		g.drawImage(offscreen, 0, 0, this);
 
 		//do the timing calculations
@@ -185,7 +205,6 @@ public class NanoVirusMain extends JFrame {
 			}
 		}, 0, 30);
 	}
-
 
 	/* (non-Javadoc)
 	 * @see javax.swing.JFrame#update(java.awt.Graphics) */
