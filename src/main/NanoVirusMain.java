@@ -14,8 +14,6 @@ public class NanoVirusMain extends JPanel {
 
 	private static NanoVirusMain	main;
 
-	private static JProgressBar		jprog;
-
 	Random							rand	= new Random();
 
 	/** current total running time in frames */
@@ -38,7 +36,7 @@ public class NanoVirusMain extends JPanel {
 
 	/** the heartbeat sound effect clip player */
 	final Sound						heartbeat;
-
+	private static int				victory;
 	/** the image used as the background */
 	private BufferedImage			bg;
 
@@ -121,8 +119,7 @@ public class NanoVirusMain extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), SwingConstants.HORIZONTAL));
 		frame.getContentPane().add(main);
-		jprog = new JProgressBar(SwingConstants.VERTICAL, 0, 1000);
-		frame.getContentPane().add(jprog);
+
 		frame.setMinimumSize(new Dimension(820, 600));
 		frame.pack();
 		frame.setVisible(true);
@@ -152,7 +149,7 @@ public class NanoVirusMain extends JPanel {
 						state.setYoff(180);
 						// speed ++;
 						// bgSpeed = speed / 2;
-						jprog.setValue((int) (jprog.getValue() * 1.1 + 1));
+						victory += 1;
 						System.out.println("capture up");
 						break;
 					case 's':
@@ -173,7 +170,6 @@ public class NanoVirusMain extends JPanel {
 
 		main.run();  // run the game
 	}
-
 	/** time the update/repaint and print an average frame rate every 60 frames */
 	private void doTiming() {
 		f++;
@@ -215,9 +211,12 @@ public class NanoVirusMain extends JPanel {
 		//draw the player 
 		bufferGraphics.drawImage(virusImage, 50, 275, 85, 85, null);
 
+		bufferGraphics.setColor(Color.BLUE);
+		bufferGraphics.setStroke(new BasicStroke(8));
+		bufferGraphics.drawArc(40, 275, 85, 85, 240, -120);
 		bufferGraphics.setColor(Color.green);
-		bufferGraphics.fillRect(785, 600 - 6 / 10 * jprog.getValue(), 15, 6 / 10 * jprog.getValue());
-		jprog.repaint();
+		bufferGraphics.setStroke(new BasicStroke(5));
+		bufferGraphics.drawArc(40, 275, 85, 85, 240, -(int) (1.2 * victory));
 		//-----------draw the buffer to the canvas
 		g.drawImage(offscreen, 0, 0, this);
 
