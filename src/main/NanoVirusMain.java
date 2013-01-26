@@ -10,61 +10,76 @@ import java.util.Timer;
 import javax.imageio.*;
 import javax.swing.*;
 
-public class NanoVirusMain extends JFrame {
+public class NanoVirusMain extends JPanel {
 
-	Random						rand	= new Random();
+	private static NanoVirusMain	main;
+
+	private static JProgressBar		jprog;
+
+	Random							rand	= new Random();
 
 	/** current total running time in frames */
-	float						f		= 0;
+	float							f		= 0;
 
 	/** current total running time in milliseconds */
-	int							dur		= 0;
+	int								dur		= 0;
 
 	/** the last time we updated the world and/or painted the display */
-	long						lastime	= Calendar.getInstance().getTimeInMillis();
+	long							lastime	= Calendar.getInstance().getTimeInMillis();
 
 	/** the global game state */
-	private final GameState		state	= new GameState(false, 0, "", 180, 30, 0);
+	private final static GameState	state	= new GameState(false, 0, "", 180, 30, 0);
 
 	/** the speed at which the background scrolls, in pixels per frame */
-	int							bgSpeed	= state.getSpeed() / 2;
+	float							bgSpeed	= state.getSpeed() / 8.0f;
 
 	/** the distance in pixels the background is translated to the left */
-	int							bgx		= 0;
+	int								bgx		= 0;
 
 	/** the heartbeat sound effect clip player */
-	final Sound					heartbeat;
+	final Sound						heartbeat;
 
 	/** the image used as the background */
-	private BufferedImage		bg;
+	private BufferedImage			bg;
 
 	/** the backing buffer used to double buffer the display
 	 * all drawing should happen here, and then copy it to the canvas */
-	private final VolatileImage	offscreen;
+	private final VolatileImage		offscreen;
 
 	/** a graphics object to draw to the backing buffer */
-	private final Graphics2D	bufferGraphics;
+	private final Graphics2D		bufferGraphics;
 
 	/** the image used for the blood vessels */
-	private BufferedImage		arteries;
+	private BufferedImage			arteries;
 
 	/** flag that indicates whether the hearbeat sound clip has just played */
-	boolean						played;
+	boolean							played;
 
-	private BufferedImage		red;
+	private BufferedImage			red;
 
-	private BufferedImage		white;
+	private static BufferedImage	virusImage;
+
+	private BufferedImage			white;
+
+	private static BufferedImage	nanoVirusDown;
+
+	private BufferedImage			nanoVirusSide;
+
+	private static BufferedImage	nanoVirus;
 
 	private NanoVirusMain() {
 		super();
 
 		try {
 			//load the background and blood vessel images
-			bg = ImageIO.read(getClass().getResourceAsStream("bgtest.jpg"));
+			bg = ImageIO.read(getClass().getResourceAsStream("background.jpg"));
 			arteries = ImageIO.read(getClass().getResourceAsStream("arteriesTile_TEST.png"));
 			red = ImageIO.read(getClass().getResourceAsStream("redBloodCell.png"));
 			white = ImageIO.read(getClass().getResourceAsStream("whiteBloodCell.png"));
-
+			nanoVirus = ImageIO.read(getClass().getResourceAsStream("nanoVirus.png"));
+			nanoVirusDown = ImageIO.read(getClass().getResourceAsStream("nanoVirusDown.png"));
+			nanoVirusSide = ImageIO.read(getClass().getResourceAsStream("nanoVirusSide.png"));
+			virusImage = nanoVirusSide;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -77,7 +92,9 @@ public class NanoVirusMain extends JFrame {
 		//set up the window
 		setPreferredSize(new Dimension(800, 600));
 		setMinimumSize(new Dimension(800, 600));
-		validate();
+
+		//	pack();
+
 		setVisible(true);
 
 		//try to use hardware acceleration
@@ -93,11 +110,23 @@ public class NanoVirusMain extends JFrame {
 		// will be written on the offscreen image.
 		bufferGraphics = offscreen.createGraphics();
 
-		bufferGraphics.setColor(Color.BLUE);
-
 		//setup eventhandlers for the window
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		addKeyListener(new KeyListener() {
+
+	}
+	/** @param args */
+	public static void main(String[] args) {
+
+		JFrame frame = new JFrame();
+		main = new NanoVirusMain();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), SwingConstants.HORIZONTAL));
+		frame.getContentPane().add(main);
+		jprog = new JProgressBar(SwingConstants.VERTICAL, 0, 1000);
+		frame.getContentPane().add(jprog);
+		frame.setMinimumSize(new Dimension(820, 600));
+		frame.pack();
+		frame.setVisible(true);
+		frame.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -119,15 +148,18 @@ public class NanoVirusMain extends JFrame {
 					case 'w':
 						//choose upper path
 						state.setTransition("up");
+						virusImage = nanoVirus;
 						state.setYoff(180);
 						// speed ++;
 						// bgSpeed = speed / 2;
+						jprog.setValue((int) (jprog.getValue() * 1.1 + 1));
 						System.out.println("capture up");
 						break;
 					case 's':
 						//choose lower path
 						// speed--;
 						// bgSpeed = speed / 2;
+						virusImage = nanoVirusDown;
 						state.setYoff(-180);
 						state.setTransition("down");
 						System.out.println("capture down");
@@ -138,10 +170,8 @@ public class NanoVirusMain extends JFrame {
 					}
 			}
 		});
-	}
-	/** @param args */
-	public static void main(String[] args) {
-		new NanoVirusMain().run();  // run the game
+
+		main.run();  // run the game
 	}
 
 	/** time the update/repaint and print an average frame rate every 60 frames */
@@ -183,9 +213,11 @@ public class NanoVirusMain extends JFrame {
 		//				(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5) + 0 * 180, 85, 85, null);
 
 		//draw the player 
-		bufferGraphics.setColor(Color.BLUE);
-		bufferGraphics.drawOval(50, 275, 50, 50);
+		bufferGraphics.drawImage(virusImage, 50, 275, 85, 85, null);
 
+		bufferGraphics.setColor(Color.green);
+		bufferGraphics.fillRect(785, 600 - 6 / 10 * jprog.getValue(), 15, 6 / 10 * jprog.getValue());
+		jprog.repaint();
 		//-----------draw the buffer to the canvas
 		g.drawImage(offscreen, 0, 0, this);
 
