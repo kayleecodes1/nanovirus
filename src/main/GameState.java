@@ -1,5 +1,6 @@
 package main;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GameState {
 	
@@ -27,7 +28,7 @@ public class GameState {
 		this.enemiesNext = new ArrayList<Enemy>();
 	}
 	
-	// ** MEMBER VARIABLE ACCESS METHODS **/
+	// ** MEMBER VARIABLE ACCESS METHODS **//
 	public boolean isPaused() {
 		return paused;
 	}
@@ -56,7 +57,7 @@ public class GameState {
 		return enemiesNext;
 	}
 	
-	//** MEMBER VARIABLE MODIFICATION METHODS **/
+	//** MEMBER VARIABLE MODIFICATION METHODS **//
 	public void setPaused(boolean paused) {
 		this.paused = paused;
 	}
@@ -162,12 +163,74 @@ public class GameState {
 	 */
 	private ArrayList<Enemy> generateEnemySet() {
 		
-		// Set up a new ArrayList of Enemies
+		// Set up a new ArrayList of Enemies.
 		ArrayList<Enemy> newEnemySet = new ArrayList<Enemy>();
 		
+		// Determine the difficulty of the rows.
+		Random randRoller = new Random();
+		// The initial chances for row difficulty.
+		int easyChance = 35;
+		int mediumChance = 50;
+		int hardChance = 15;
+		// Go through each row and determine the enemies in that row.
+		for(int y = 0; y < 3; y++) {
+			
+			int roll = randRoller.nextInt(easyChance + mediumChance + hardChance);
+			// Generate an easy set of enemies for this row.
+			if(roll < easyChance) {
+				
+				// An easy row randomly picks from a pool of:
+				// 3 red blood cell, 4 nothing, 1 white blood cell
+				generateEnemyRow(3, 4, 1, y, newEnemySet);
+				
+				// Increase the chances of the other difficulty types.
+				mediumChance += easyChance;
+				hardChance += easyChance;
+				
+			// Generate a medium set of enemies for this row.
+			} else if(roll < (easyChance + mediumChance)) {
+				
+				// A medium row randomly picks from a pool of:
+				// 2 red blood cell, 3 nothing, 2 white blood cell
+				generateEnemyRow(2, 3, 2, y, newEnemySet);
+				
+				// Increase the chances of the other difficulty types.
+				easyChance += mediumChance;
+				hardChance += mediumChance;
+			
+			// Generate a hard set of enemies for this row.
+			} else {
+				
+				// A hard row randomly picks from a pool of:
+				// 1 red blood cell, 2 nothing, 3 white blood cell
+				generateEnemyRow(1, 2, 3, y, newEnemySet);
+				
+				// Increase the chances of the other difficulty types.
+				easyChance += hardChance;
+				mediumChance += hardChance;
+			}
+		}
 		
-		
-		// Return the generated set of enmies.
+		// Return the generated set of enemies.
 		return newEnemySet;
+	}
+	
+	/**
+	 * 		@param red, @param nothing, @param white, @param y, @param enemySet
+	 * 
+	 * 		generateEnemyRow: 	Generates a row of enemies based on a given
+	 * 							pool of elements to pick from and adds these 
+	 * 							enemies to the given ArrayList.
+	 */
+	private void generateEnemyRow(int red, int nothing, int white, int y, ArrayList<Enemy> enemySet) {
+		
+		// Randomly pick 3 elements for the row from the given pool.
+		Random randRoller = new Random();
+		for(int x = 0; x < 3; x++) {
+			
+			// 
+			randRoller.nextInt(red + nothing + white);
+			//enemySet.add(new Enemy(type , x, y));
+		}
 	}
 }
