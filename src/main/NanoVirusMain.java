@@ -203,18 +203,16 @@ public class NanoVirusMain extends JPanel {
 				img = red;
 			else
 				img = white;
-			bufferGraphics.drawImage(img, (int) (500 - state.getX() + (rand.nextFloat() - .5) * 5) + e.getX() * 100,
-					(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5) + e.getY() * 180, 85, 85, null);
+			bufferGraphics.drawImage(img, 500 - state.getX() + e.getX() * 100, 250 - state.getY() + +e.getY() * 180,
+					85, 85, null);
 		}
 		for (Enemy e : state.getNextEnemies()) {
 			if (e.getType() == 0)
 				img = red;
 			else
 				img = white;
-			bufferGraphics.drawImage(img, (int) (500 - state.getX() + (rand.nextFloat() - .5) * 5) + e.getX() * 100
-					+ 800,
-					(int) (-state.getYoff() + 250 - state.getY() + (rand.nextFloat() - .5) * 5) + e.getY() * 180, 85,
-					85, null);
+			bufferGraphics.drawImage(img, 500 - state.getX() + e.getX() * 100 + 800,
+					-state.getYoff() + 250 - state.getY() + e.getY() * 180, 85, 85, null);
 		}
 		//		bufferGraphics.drawImage(red, (int) (700 - state.getX() + (rand.nextFloat() - .5) * 5),
 		//				(int) (250 - state.getY() + (rand.nextFloat() - .5) * 5) + 0 * 180, 85, 85, null);
